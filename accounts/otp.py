@@ -7,7 +7,7 @@ import random
 
 def send_otp(username, email):
     # Generating OTP and Sending Email
-    otp_no = str(random.randint(100000, 999999))
+    otp_no = str(random.randint(1000, 9999))
     
     # Store the OTP in the database
     user = Account.objects.get(email=email)

@@ -116,6 +116,7 @@ class LoginView(APIView):
         if user is not None:
             if user.is_verified == True:
                 tokens = create_jwt_pair_tokens(user)
+                refresh_token = RefreshToken(tokens['refresh'])
                 profile = {}
 
                 # if user.user_type.user_type_name == 'Freelancer':
@@ -126,18 +127,24 @@ class LoginView(APIView):
                 #     print("not user nor freelancer")
 
                 response = {
-                    "message" : "Login Successful",
-                    "token" : tokens,
-                    # "profile_id" : profile.id,
-                    "is_login" : True,
-                    "user" : {
-                        "user_id" : user.id,
-                        "email" : user.email,
-                        "user_type" : user.user_type.user_type_name,
-                        # "profile_id" : profile.id
+                    "message": "Login Successful",
+                    "access_token": tokens['access'],
+                    "refresh_token": tokens['refresh'],
+                    "token_expiry": refresh_token['exp'],
+                    "is_login": True,
+                    "user": {
+                        "user_id": user.id,
+                        "first_name": user.first_name,
+                        "last_name": user.last_name,
+                        "username": user.username,
+                        "phone_number": user.phone_number,
+                        "email": user.email,
+                        "user_type": user.user_type.user_type_name,
+                        "is_active": user.is_active
                     }
                 }
                 return Response(data=response, status=status.HTTP_200_OK)
+
             
             else:
                 response = {
@@ -149,14 +156,14 @@ class LoginView(APIView):
             return Response(data={"message" : "Invalid email or password !"}, status=status.HTTP_400_BAD_REQUEST)
         
 
-class LogoutView(APIView):
-    permission_classes = (IsAuthenticated,)
+# class LogoutView(APIView):
+#     permission_classes = (IsAuthenticated,)
     
-    def post(self, request):
-        try:
-            refresh_token = request.data["refresh_token"]
-            token = RefreshToken(refresh_token)
-            token.blacklist()
-            return Response(status=status.HTTP_205_RESET_CONTENT)
-        except Exception:
-            return Response(status=status.HTTP_400_BAD_REQUEST)
+#     def post(self, request):
+#         try:
+#             refresh_token = request.data["refresh_token"]
+#             token = RefreshToken(refresh_token)
+#             token.blacklist()
+#             return Response(status=status.HTTP_205_RESET_CONTENT)
+#         except Exception:
+#             return Response(status=status.HTTP_400_BAD_REQUEST)
