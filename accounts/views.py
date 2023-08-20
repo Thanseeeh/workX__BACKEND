@@ -117,14 +117,6 @@ class LoginView(APIView):
             if user.is_verified == True:
                 tokens = create_jwt_pair_tokens(user)
                 refresh_token = RefreshToken(tokens['refresh'])
-                profile = {}
-
-                # if user.user_type.user_type_name == 'Freelancer':
-                #     profile = FreelancerProfile.objects.get(freelancer=user)
-                # elif user.user_type.user_type_name == 'User':
-                #     profile = Account.objects.get(user=user)
-                # else:
-                #     print("not user nor freelancer")
 
                 response = {
                     "message": "Login Successful",
@@ -154,16 +146,3 @@ class LoginView(APIView):
 
         else:
             return Response(data={"message" : "Invalid email or password !"}, status=status.HTTP_400_BAD_REQUEST)
-        
-
-# class LogoutView(APIView):
-#     permission_classes = (IsAuthenticated,)
-    
-#     def post(self, request):
-#         try:
-#             refresh_token = request.data["refresh_token"]
-#             token = RefreshToken(refresh_token)
-#             token.blacklist()
-#             return Response(status=status.HTTP_205_RESET_CONTENT)
-#         except Exception:
-#             return Response(status=status.HTTP_400_BAD_REQUEST)

@@ -15,9 +15,6 @@ class FreelancerProfile(models.Model):
     profile_photo = models.ImageField(upload_to='profle picture', blank=True)
     about = models.TextField(blank=True)
     date_of_birth = models.DateField(blank=True, null=True) 
-
-    # category = models.ForeignKey(CompanyCategory, on_delete=models.CASCADE, blank=True, null=True)
-    # department = models.ForeignKey(CompanyDepartment, on_delete=models.CASCADE, blank=True, null=True)
     level = models.CharField(default='fresher', choices=FREELANCER_STATUS, max_length=20)
     city = models.CharField(max_length=20, blank=True)
     state = models.CharField(max_length=20, blank=True)
