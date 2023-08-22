@@ -65,6 +65,7 @@ class Account(AbstractBaseUser):
     is_staff = models.BooleanField(default=False)
     is_superuser = models.BooleanField(default=False)
     is_admin        = models.BooleanField(default=False)
+    is_profile   = models.BooleanField(default=False)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     otp = models.CharField(max_length=10, blank=True)

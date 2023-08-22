@@ -13,6 +13,7 @@ from django.contrib.auth import authenticate
 from rest_framework_simplejwt.token_blacklist.models import BlacklistedToken, OutstandingToken
 from rest_framework_simplejwt.tokens import RefreshToken
 from freelancers.models import FreelancerProfile
+from users.models import UserProfile
 from django.core.exceptions import ObjectDoesNotExist
 from .token import create_jwt_pair_tokens
 from .otp import send_otp
@@ -51,7 +52,7 @@ class SignUpView(generics.GenericAPIView):
                 user_type = UserType.objects.get(user_type_name = 'User')
                 user.user_type = user_type
                 user.save()
-
+                UserProfile.objects.create(user = user)
                 phone_number = data.get('phone_number')
                 email = data.get('email')
                 username = data.get('username')
@@ -132,7 +133,8 @@ class LoginView(APIView):
                         "phone_number": user.phone_number,
                         "email": user.email,
                         "user_type": user.user_type.user_type_name,
-                        "is_active": user.is_active
+                        "is_active": user.is_active,
+                        "is_profile": user.is_profile
                     }
                 }
                 return Response(data=response, status=status.HTTP_200_OK)
