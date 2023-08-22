@@ -3,7 +3,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from .models import FreelancerProfile
-from .serializers import FreelancerProfileSerializer
+from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer
 
 class FreelancerProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -29,3 +29,12 @@ class FreelancerProfileView(APIView):
             return Response({'message': 'Updated successfully'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class FreelancerProfileListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        profiles = FreelancerProfile.objects.all()
+        serializer = FreelancerProfileListSerializer(profiles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
