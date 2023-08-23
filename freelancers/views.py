@@ -31,7 +31,6 @@ class FreelancerProfileView(APIView):
         serializer = FreelancerProfileSerializer(profile, data=request.data)
 
         if serializer.is_valid():
-            # Handle the profile photo upload separately
             if 'profile_photo' in request.FILES:
                 profile.profile_photo = request.FILES['profile_photo']
 
