@@ -5,7 +5,10 @@ from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
 from .models import FreelancerProfile
+from rest_framework.generics import RetrieveAPIView
 from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer
+
+
 
 class FreelancerProfileView(APIView):
     permission_classes = [IsAuthenticated]
@@ -48,3 +51,16 @@ class FreelancerProfileListView(APIView):
         profiles = FreelancerProfile.objects.all()
         serializer = FreelancerProfileListSerializer(profiles, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AuthenticatedFreelancerProfile(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            profile = FreelancerProfile.objects.get(freelancer=request.user)
+            serializer = FreelancerProfileListSerializer(profile)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except FreelancerProfile.DoesNotExist:
+            return Response({'message': 'Freelancer profile not found'}, status=status.HTTP_404_NOT_FOUND)
