@@ -3,8 +3,9 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from .models import FreelancerProfile
+from .models import FreelancerProfile, FreelancerSkills
 from rest_framework.generics import RetrieveAPIView
 from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer, FreelancerSkillSerializer
 
@@ -78,3 +79,29 @@ class AddFreelancerSkill(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
+
+class FreelancerSkillsList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            skills = FreelancerSkills.objects.filter(freelancer=request.user)
+            serializer = FreelancerSkillSerializer(skills, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Skills not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class UpdateFreelancerSkill(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, skill_id):
+        try:
+            skill = get_object_or_404(FreelancerSkills, pk=skill_id, freelancer=request.user)
+            skill.delete()
+            return Response({'message': 'Skill deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except FreelancerSkills.DoesNotExist:
+            return Response({'message': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Failed to delete skill'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
