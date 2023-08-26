@@ -13,6 +13,7 @@ class FreelancerProfile(models.Model):
     ]
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
     profile_photo = models.ImageField(upload_to='profile', blank=True, null=True)
+    title = models.CharField(max_length=20, blank=True)
     about = models.TextField(blank=True)
     date_of_birth = models.DateField(blank=True, null=True) 
     level = models.CharField(default='fresher', choices=FREELANCER_STATUS, max_length=20)
@@ -25,3 +26,11 @@ class FreelancerProfile(models.Model):
 
     def __str__(self):
         return str(self.freelancer)
+    
+
+class FreelancerSkills(models.Model):
+    skill = models.CharField(max_length=30, blank=True, unique=True)
+    freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.skill)
