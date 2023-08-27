@@ -29,7 +29,7 @@ class FreelancerProfile(models.Model):
     
 
 class FreelancerSkills(models.Model):
-    skill = models.CharField(max_length=30, blank=True, unique=True)
+    skill = models.CharField(max_length=50, blank=True, unique=True)
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     def __str__(self):
@@ -37,8 +37,8 @@ class FreelancerSkills(models.Model):
 
 
 class FreelancerExperience(models.Model):
-    title = models.CharField(max_length=30, unique=True, blank=True)
-    company = models.CharField(max_length=30, blank=True)
+    title = models.CharField(max_length=50, unique=True, blank=True)
+    company = models.CharField(max_length=50, blank=True)
     year = models.CharField(max_length=10, blank=True)
     description = models.TextField(blank=True)
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
@@ -48,10 +48,10 @@ class FreelancerExperience(models.Model):
     
 
 class FreelancerEducation(models.Model):
-    course = models.CharField(max_length=30, unique=True, blank=True)
-    college = models.CharField(max_length=30, blank=True)
+    course = models.CharField(max_length=50, unique=True, blank=True)
+    college = models.CharField(max_length=50, blank=True)
     year = models.CharField(max_length=10, blank=True)
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     def __str__(self):
-        return str(self.title)
+        return str(self.course)

@@ -160,7 +160,7 @@ class AddFreelancerEducation(APIView):
     
 
 
-class FreelancerEducation(APIView):
+class FreelancerEducationList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):

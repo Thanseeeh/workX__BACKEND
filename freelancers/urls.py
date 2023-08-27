@@ -10,7 +10,7 @@ from .views import (
     FreelancerExperienceList, 
     UpdateFreelancerExperience,
     AddFreelancerEducation,
-    FreelancerEducation,
+    FreelancerEducationList,
     UpdateFreelancerEducation,
     )
 
@@ -26,6 +26,6 @@ urlpatterns = [
     path('freelancer-experience/', FreelancerExperienceList.as_view(), name='freelancer-experience'),
     path('freelancer-experience/update/<int:experience_id>/', UpdateFreelancerExperience.as_view(), name='update_freelancer_experience'),
     path('freelancer-addeducation/', AddFreelancerEducation.as_view(), name='freelancer-addeducation'),
-    path('freelancer-education/', FreelancerEducation.as_view(), name='freelancer-education'),
+    path('freelancer-education/', FreelancerEducationList.as_view(), name='freelancer-education'),
     path('freelancer-education/update/<int:education_id>/', UpdateFreelancerEducation.as_view(), name='update_freelancer_education'),
 ]
