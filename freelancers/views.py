@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation
 from rest_framework.generics import RetrieveAPIView
-from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer, FreelancerSkillSerializer, FreelancerExperienceSerializer
+from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer, FreelancerSkillSerializer, FreelancerExperienceSerializer, FreelancerEducationSerializer
 
 
 
@@ -145,3 +145,43 @@ class UpdateFreelancerExperience(APIView):
             return Response({'message': 'Experience not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'message': 'Failed to delete Experience'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class AddFreelancerEducation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = FreelancerEducationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class FreelancerEducation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            education = FreelancerEducation.objects.filter(freelancer=request.user)
+            serializer = FreelancerEducationSerializer(education, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class UpdateFreelancerEducation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, education_id):
+        try:
+            education = get_object_or_404(FreelancerEducation, pk=education_id, freelancer=request.user)
+            education.delete()
+            return Response({'message': 'Education deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except FreelancerEducation.DoesNotExist:
+            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Failed to delete Education'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

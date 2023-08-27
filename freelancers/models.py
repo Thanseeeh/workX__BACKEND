@@ -40,7 +40,17 @@ class FreelancerExperience(models.Model):
     title = models.CharField(max_length=30, unique=True, blank=True)
     company = models.CharField(max_length=30, blank=True)
     year = models.CharField(max_length=10, blank=True)
-    description = models.CharField(max_length=250, blank=True)
+    description = models.TextField(blank=True)
+    freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+    def __str__(self):
+        return str(self.title)
+    
+
+class FreelancerEducation(models.Model):
+    course = models.CharField(max_length=30, unique=True, blank=True)
+    college = models.CharField(max_length=30, blank=True)
+    year = models.CharField(max_length=10, blank=True)
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
 
     def __str__(self):
