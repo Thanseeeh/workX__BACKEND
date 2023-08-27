@@ -1,5 +1,15 @@
 from django.urls import path
-from .views import FreelancerProfileView, FreelancerProfileListView, AuthenticatedFreelancerProfile, AddFreelancerSkill, FreelancerSkillsList, UpdateFreelancerSkill
+from .views import (
+    FreelancerProfileView, 
+    FreelancerProfileListView, 
+    AuthenticatedFreelancerProfile, 
+    AddFreelancerSkill, 
+    FreelancerSkillsList, 
+    UpdateFreelancerSkill, 
+    AddFreelancerExperience, 
+    FreelancerExperienceList, 
+    UpdateFreelancerExperience,
+    )
 
 urlpatterns = [
     path('freelancer-createprofile/', FreelancerProfileView.as_view(), name='create-freelancer-profile'),
@@ -9,4 +19,7 @@ urlpatterns = [
     path('freelancer-addskill/', AddFreelancerSkill.as_view(), name='freelancer-addskill'),
     path('freelancer-skills/', FreelancerSkillsList.as_view(), name='freelancer-skills'),
     path('freelancer-skills/update/<int:skill_id>/', UpdateFreelancerSkill.as_view(), name='update_freelancer_skill'),
+    path('freelancer-addexperience/', AddFreelancerExperience.as_view(), name='freelancer-addexperience'),
+    path('freelancer-experience/', FreelancerExperienceList.as_view(), name='freelancer-experience'),
+    path('freelancer-experience/update/<int:experience_id>/', UpdateFreelancerExperience.as_view(), name='update_freelancer_experience'),
 ]

@@ -5,9 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from .models import FreelancerProfile, FreelancerSkills
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience
 from rest_framework.generics import RetrieveAPIView
-from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer, FreelancerSkillSerializer
+from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer, FreelancerSkillSerializer, FreelancerExperienceSerializer
 
 
 
@@ -105,3 +105,43 @@ class UpdateFreelancerSkill(APIView):
             return Response({'message': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'message': 'Failed to delete skill'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class AddFreelancerExperience(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = FreelancerExperienceSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class FreelancerExperienceList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            experience = FreelancerExperience.objects.filter(freelancer=request.user)
+            serializer = FreelancerExperienceSerializer(experience, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Experience not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class UpdateFreelancerExperience(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, experience_id):
+        try:
+            experience = get_object_or_404(FreelancerExperience, pk=experience_id, freelancer=request.user)
+            experience.delete()
+            return Response({'message': 'Experience deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except FreelancerExperience.DoesNotExist:
+            return Response({'message': 'Experience not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Failed to delete Experience'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
