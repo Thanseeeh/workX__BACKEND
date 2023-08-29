@@ -5,6 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
 from freelancers.models import FreelancerProfile
+from rest_framework.parsers import MultiPartParser, FormParser
+from .serializers import CategorySerializer
+from .models import Category
 
 # Create your views here.
 
@@ -51,3 +54,25 @@ class RegisterFreelancerView(APIView):
         
         except Account.DoesNotExist:
             return Response({"message": "Freelancer not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+class AddCategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = CategorySerializer(data=request.data)
+
+        if serializer.is_valid():
+            category = serializer.save(is_active=True)
+            return Response({"message": "Category created successfully"}, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+class CategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
