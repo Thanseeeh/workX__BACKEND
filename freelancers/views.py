@@ -5,9 +5,16 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
 from rest_framework.generics import RetrieveAPIView
-from .serializers import FreelancerProfileSerializer, FreelancerProfileListSerializer, FreelancerSkillSerializer, FreelancerExperienceSerializer, FreelancerEducationSerializer
+from .serializers import (
+    FreelancerProfileSerializer, 
+    FreelancerProfileListSerializer, 
+    FreelancerSkillSerializer, 
+    FreelancerExperienceSerializer, 
+    FreelancerEducationSerializer, 
+    GigsSerializer,
+    )
 
 
 
@@ -105,7 +112,47 @@ class UpdateFreelancerSkill(APIView):
             return Response({'message': 'Skill not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'message': 'Failed to delete skill'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class AddFreelancerEducation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        serializer = FreelancerEducationSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+class FreelancerEducationList(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        try:
+            education = FreelancerEducation.objects.filter(freelancer=request.user)
+            serializer = FreelancerEducationSerializer(education, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
         
+
+
+class UpdateFreelancerEducation(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, education_id):
+        try:
+            education = get_object_or_404(FreelancerEducation, pk=education_id, freelancer=request.user)
+            education.delete()
+            return Response({'message': 'Education deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except FreelancerEducation.DoesNotExist:
+            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Failed to delete Education'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 
 class AddFreelancerExperience(APIView):
@@ -148,40 +195,48 @@ class UpdateFreelancerExperience(APIView):
         
 
 
-class AddFreelancerEducation(APIView):
+class AddGigs(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
-        serializer = FreelancerEducationSerializer(data=request.data)
+        serializer = GigsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            serializer.save(freelancer=request.user)  # Assign the freelancer to the gig
+
+            # You can also log the created gig's data here
+            print("Gig created successfully:", serializer.data)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            # Log the validation errors for debugging
+            print("Gig validation errors:", serializer.errors)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 
-class FreelancerEducationList(APIView):
+class GigsList(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         try:
-            education = FreelancerEducation.objects.filter(freelancer=request.user)
-            serializer = FreelancerEducationSerializer(education, many=True)
+            gigs = FreelancerGigs.objects.filter(freelancer=request.user)
+            serializer = GigsSerializer(gigs, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
         
 
 
-class UpdateFreelancerEducation(APIView):
+class UpdateGigs(APIView):
     permission_classes = [IsAuthenticated]
 
-    def delete(self, request, education_id):
+    def delete(self, request, gigs_id):
         try:
-            education = get_object_or_404(FreelancerEducation, pk=education_id, freelancer=request.user)
-            education.delete()
-            return Response({'message': 'Education deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
-        except FreelancerEducation.DoesNotExist:
-            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
+            gigs = get_object_or_404(FreelancerGigs, pk=gigs_id, freelancer=request.user)
+            gigs.delete()
+            return Response({'message': 'Gigs deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except FreelancerGigs.DoesNotExist:
+            return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'message': 'Failed to delete Education'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+            return Response({'message': 'Failed to delete Gigs'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

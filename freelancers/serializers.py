@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from accounts.models import Account
 from accounts.serializers import UserViewSerializer
-from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
 
 
 
@@ -31,13 +31,19 @@ class FreelancerSkillSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class FreelancerEducationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = FreelancerEducation
+        fields = '__all__'
+
+
 class FreelancerExperienceSerializer(serializers.ModelSerializer):
     class Meta:
         model = FreelancerExperience
         fields = '__all__'
 
 
-class FreelancerEducationSerializer(serializers.ModelSerializer):
+class GigsSerializer(serializers.ModelSerializer):
     class Meta:
-        model = FreelancerEducation
+        model = FreelancerGigs
         fields = '__all__'

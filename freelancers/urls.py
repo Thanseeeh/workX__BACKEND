@@ -12,6 +12,9 @@ from .views import (
     AddFreelancerEducation,
     FreelancerEducationList,
     UpdateFreelancerEducation,
+    AddGigs,
+    GigsList,
+    UpdateGigs
     )
 
 urlpatterns = [
@@ -22,10 +25,13 @@ urlpatterns = [
     path('freelancer-addskill/', AddFreelancerSkill.as_view(), name='freelancer-addskill'),
     path('freelancer-skills/', FreelancerSkillsList.as_view(), name='freelancer-skills'),
     path('freelancer-skills/update/<int:skill_id>/', UpdateFreelancerSkill.as_view(), name='update_freelancer_skill'),
-    path('freelancer-addexperience/', AddFreelancerExperience.as_view(), name='freelancer-addexperience'),
-    path('freelancer-experience/', FreelancerExperienceList.as_view(), name='freelancer-experience'),
-    path('freelancer-experience/update/<int:experience_id>/', UpdateFreelancerExperience.as_view(), name='update_freelancer_experience'),
     path('freelancer-addeducation/', AddFreelancerEducation.as_view(), name='freelancer-addeducation'),
     path('freelancer-education/', FreelancerEducationList.as_view(), name='freelancer-education'),
     path('freelancer-education/update/<int:education_id>/', UpdateFreelancerEducation.as_view(), name='update_freelancer_education'),
+    path('freelancer-addexperience/', AddFreelancerExperience.as_view(), name='freelancer-addexperience'),
+    path('freelancer-experience/', FreelancerExperienceList.as_view(), name='freelancer-experience'),
+    path('freelancer-experience/update/<int:experience_id>/', UpdateFreelancerExperience.as_view(), name='update_freelancer_experience'),
+    path('freelancer-addgigs/', AddGigs.as_view(), name='freelancer-addgigs'),
+    path('freelancer-gigs/', GigsList.as_view(), name='freelancer-gigs'),
+    path('freelancer-gigs/update/<int:gigs_id>/', UpdateGigs.as_view(), name='update_freelancer_gigs'),
 ]

@@ -73,6 +73,21 @@ class CategoryView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
-        categories = Category.objects.all()
+        categories = Category.objects.filter(is_active=True)
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+class BlockUnBlockCategoryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, cat_id):
+        try:
+            instance = Category.objects.get(id=cat_id)
+            instance.is_active = not instance.is_active
+            instance.save()
+
+            return Response({"message": "Category status changed"}, status=status.HTTP_200_OK)
+        
+        except Category.DoesNotExist:
+            return Response({"message": "Category not found"}, status=status.HTTP_404_NOT_FOUND)

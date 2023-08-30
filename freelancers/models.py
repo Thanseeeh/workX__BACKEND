@@ -1,5 +1,6 @@
 from django.db import models
 from accounts.models import Account
+from superadmin.models import Category
 
 # Create your models here.
 
@@ -55,3 +56,19 @@ class FreelancerEducation(models.Model):
 
     def __str__(self):
         return str(self.course)
+    
+
+class FreelancerGigs(models.Model):
+    title = models.CharField(max_length=100)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, null=True, blank=True, related_name='category')
+    description = models.TextField(blank=True)
+    starting_price = models.PositiveIntegerField(blank=True, null=True)
+    delivery_time = models.CharField(max_length=20, blank=True, null=True)
+    available_requirements = models.TextField(blank=True, help_text="Enter each requirement on a new line.")
+    tags = models.CharField(max_length=255, blank=True, help_text="Enter tags separated by commas (e.g., tag1, tag2).")
+    images = models.ImageField(upload_to='gigs')
+    freelancer = models.ForeignKey(Account, on_delete=models.CASCADE)
+
+
+class Image(models.Model):
+    name = models.CharField(max_length=100)
