@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs, Image
 from rest_framework.generics import RetrieveAPIView
 from .serializers import (
     FreelancerProfileSerializer, 
@@ -201,16 +201,16 @@ class AddGigs(APIView):
     def post(self, request, *args, **kwargs):
         serializer = GigsSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save(freelancer=request.user)  # Assign the freelancer to the gig
+            gig = serializer.save(freelancer=request.user)
 
-            # You can also log the created gig's data here
+            image_data = request.data.getlist('images')
+            for image in image_data:
+                Image.objects.create(gig=gig, image=image)
+
             print("Gig created successfully:", serializer.data)
-
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            # Log the validation errors for debugging
             print("Gig validation errors:", serializer.errors)
-
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
@@ -222,6 +222,7 @@ class GigsList(APIView):
         try:
             gigs = FreelancerGigs.objects.filter(freelancer=request.user)
             serializer = GigsSerializer(gigs, many=True)
+            
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
@@ -240,3 +241,19 @@ class UpdateGigs(APIView):
             return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'message': 'Failed to delete Gigs'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class BlockUnBlockGigsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, gig_id):
+        try:
+            instance = FreelancerGigs.objects.get(id=gig_id)
+            instance.is_active = not instance.is_active
+            instance.save()
+
+            return Response({"message": "Gig status changed"}, status=status.HTTP_200_OK)
+        
+        except FreelancerGigs.DoesNotExist:
+            return Response({"message": "Gig not found"}, status=status.HTTP_404_NOT_FOUND)

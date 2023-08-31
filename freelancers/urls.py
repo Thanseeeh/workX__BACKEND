@@ -14,7 +14,8 @@ from .views import (
     UpdateFreelancerEducation,
     AddGigs,
     GigsList,
-    UpdateGigs
+    UpdateGigs,
+    BlockUnBlockGigsView
     )
 
 urlpatterns = [
@@ -34,4 +35,5 @@ urlpatterns = [
     path('freelancer-addgigs/', AddGigs.as_view(), name='freelancer-addgigs'),
     path('freelancer-gigs/', GigsList.as_view(), name='freelancer-gigs'),
     path('freelancer-gigs/update/<int:gigs_id>/', UpdateGigs.as_view(), name='update_freelancer_gigs'),
+    path('block-unblock-gigs/<int:gig_id>/', BlockUnBlockGigsView.as_view(), name='block-unblock-gig_id'),
 ]
