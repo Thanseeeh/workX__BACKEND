@@ -5,7 +5,11 @@ from rest_framework import status
 from accounts.models import Account
 from .models import UserProfile
 from .serializers import UserProfileSerializer, UserProfileListSerializer
+from superadmin.models import Category
+from superadmin.serializers import CategorySerializer
 
+
+# UserProfile
 class UserProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
@@ -35,10 +39,20 @@ class UserProfileView(APIView):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
+# UserProfileListing
 class UserProfileListView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, *args, **kwargs):
         profiles = UserProfile.objects.all()
         serializer = UserProfileListSerializer(profiles, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+# CategoryListing
+class CategoryListView(APIView):
+
+    def get(self, request, *args, **kwargs):
+        categories = Category.objects.all()
+        serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)

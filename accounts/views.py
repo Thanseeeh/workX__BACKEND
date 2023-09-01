@@ -22,6 +22,7 @@ import datetime
 # Create your views here.
 
 
+#SignUp 
 class SignUpView(generics.GenericAPIView):
     serializer_class    = SignUpSerializer
     permission_classes  = [AllowAny]
@@ -77,6 +78,7 @@ class SignUpView(generics.GenericAPIView):
             return Response(data=errorMessage, status=status.HTTP_400_BAD_REQUEST)
         
 
+#OptVerification
 class Verify_otpView(APIView):
     def post(self, request: Request):
         data = request.data
@@ -92,7 +94,7 @@ class Verify_otpView(APIView):
 
         if stored_otp == check_otp:
             user.is_verified = True
-            user.otp = ""  # Clear the OTP
+            user.otp = ""
             user.save()
 
             return Response(
@@ -105,6 +107,7 @@ class Verify_otpView(APIView):
             )
         
 
+#Login
 class LoginView(APIView):
     permission_classes = [AllowAny]
 

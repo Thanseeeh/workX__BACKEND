@@ -4,6 +4,7 @@ from accounts.models import Account
 # Create your models here.
 
 
+# Profile
 class UserProfile(models.Model):
 
     user = models.ForeignKey(Account, on_delete=models.CASCADE)
