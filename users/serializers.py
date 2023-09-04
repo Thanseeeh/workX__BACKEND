@@ -1,6 +1,9 @@
 from rest_framework import serializers
 from accounts.models import Account
 from accounts.serializers import UserViewSerializer
+from superadmin.serializers import CategorySerializer
+from freelancers.serializers import FreelancerSerializer
+from freelancers.models import FreelancerGigs
 from .models import UserProfile
 
 
@@ -24,4 +27,13 @@ class UserProfileListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = UserProfile
+        fields = '__all__'
+
+
+# GigsListing
+class GigsListingSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    freelancer = FreelancerSerializer()
+    class Meta:
+        model = FreelancerGigs
         fields = '__all__'

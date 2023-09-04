@@ -5,7 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs, Image
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
 from rest_framework.generics import RetrieveAPIView
 from .serializers import (
     FreelancerProfileSerializer, 
@@ -197,22 +197,28 @@ class UpdateFreelancerExperience(APIView):
 
 class AddGigs(APIView):
     permission_classes = [IsAuthenticated]
+    parser_classes = [MultiPartParser, FormParser]
 
     def post(self, request, *args, **kwargs):
         serializer = GigsSerializer(data=request.data)
         if serializer.is_valid():
             gig = serializer.save(freelancer=request.user)
 
-            image_data = request.data.getlist('images')
-            for image in image_data:
-                Image.objects.create(gig=gig, image=image)
+            if 'images1' in request.FILES:
+                gig.image1 = request.FILES['images1']
+            if 'images2' in request.FILES:
+                gig.image2 = request.FILES['images2']
+            if 'images3' in request.FILES:
+                gig.image3 = request.FILES['images3']
+            
+            gig.is_active = True
+            gig.save()
 
-            print("Gig created successfully:", serializer.data)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
-            print("Gig validation errors:", serializer.errors)
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 
 
 class GigsList(APIView):
@@ -225,7 +231,7 @@ class GigsList(APIView):
             
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
-            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)
         
 
 

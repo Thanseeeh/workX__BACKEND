@@ -7,6 +7,8 @@ from .models import UserProfile
 from .serializers import UserProfileSerializer, UserProfileListSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
+from freelancers.models import FreelancerGigs
+from .serializers import GigsListingSerializer
 
 
 # UserProfile
@@ -51,8 +53,18 @@ class UserProfileListView(APIView):
 
 # CategoryListing
 class CategoryListView(APIView):
-
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+# GigsListing
+class GigsListView(APIView):
+    def get(self, request, *args, **kwargs):
+        try:
+            gigs = FreelancerGigs.objects.all()
+            serializer = GigsListingSerializer(gigs, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)

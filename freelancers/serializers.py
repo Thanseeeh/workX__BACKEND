@@ -1,8 +1,7 @@
 from rest_framework import serializers
 from accounts.models import Account
 from accounts.serializers import UserViewSerializer
-from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs, Image
-
+from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
 
 
 class FreelancerSerializer(serializers.ModelSerializer):
@@ -43,20 +42,7 @@ class FreelancerExperienceSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class GigImageSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Image
-        fields = ('image', )
-
-
 class GigsSerializer(serializers.ModelSerializer):
-    gig_images = serializers.SerializerMethodField()
-
     class Meta:
         model = FreelancerGigs
         fields = '__all__'
-
-    def get_gig_images(self, obj):
-        images = Image.objects.filter(gig=obj)
-        serializer = GigImageSerializer(instance=images, many=True)
-        return serializer.data
