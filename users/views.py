@@ -7,7 +7,7 @@ from .models import UserProfile
 from .serializers import UserProfileSerializer, UserProfileListSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
-from freelancers.models import FreelancerGigs
+from freelancers.models import FreelancerGigs, FreelancerProfile
 from .serializers import GigsListingSerializer
 
 
@@ -68,3 +68,14 @@ class GigsListView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# LocationListing
+class LocationListView(APIView):
+    def get(self, request, format=None):
+        try:
+            unique_states = FreelancerProfile.objects.values_list('state', flat=True).distinct()
+            return Response({'states': list(unique_states)}, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
