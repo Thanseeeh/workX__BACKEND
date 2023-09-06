@@ -1,11 +1,13 @@
 from django.urls import path
-from .views import UserProfileView, UserProfileListView, CategoryListView, GigsListView, LocationListView
+from .views import UserProfileView, UserProfileListView, CategoryListView, GigsListView, LocationListView, SkillsListView, AuthenticatedUserProfile
 
 urlpatterns = [
-    path('user-createprofile/', UserProfileView.as_view(), name='create-freelancer-profile'),
-    path('user-createprofile/<int:id>/', UserProfileView.as_view(), name='update-freelancer-profile'),
-    path('user-profiles/', UserProfileListView.as_view(), name='freelancer-profile-list'),
+    path('user-createprofile/', UserProfileView.as_view(), name='create-user-profile'),
+    path('user-createprofile/<int:id>/', UserProfileView.as_view(), name='update-user-profile'),
+    path('user-profiles/', UserProfileListView.as_view(), name='user-profile-list'),
+    path('user-profile/', AuthenticatedUserProfile.as_view(), name='user-profile'),
     path('user-categories/', CategoryListView.as_view(), name='categories'),
     path('user-gigs/', GigsListView.as_view(), name='gigs'),
-    path('user-locations/', LocationListView.as_view(), name='locations')
+    path('user-locations/', LocationListView.as_view(), name='locations'),
+    path('user-skills/', SkillsListView.as_view(), name='skills')
 ]
