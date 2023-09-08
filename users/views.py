@@ -4,11 +4,11 @@ from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
 from .models import UserProfile
-from .serializers import UserProfileSerializer, UserProfileListSerializer
+from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills
-from .serializers import GigsListingSerializer
+from freelancers.serializers import GigsSerializer
 
 
 # UserProfile
@@ -103,3 +103,14 @@ class SkillsListView(APIView):
         
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+# SingleViewOfGigs
+class GigDetailView(APIView):
+    def get(self, request, id, *args, **kwargs):
+        try:
+            gig = FreelancerGigs.objects.get(id=id)
+            serializer = GigDetailSerializer(gig)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except FreelancerGigs.DoesNotExist:
+            return Response({'message': 'Gig not found'}, status=status.HTTP_404_NOT_FOUND)

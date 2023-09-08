@@ -1,5 +1,14 @@
 from django.urls import path
-from .views import UserProfileView, UserProfileListView, CategoryListView, GigsListView, LocationListView, SkillsListView, AuthenticatedUserProfile
+from .views import (
+    UserProfileView, 
+    UserProfileListView, 
+    CategoryListView, 
+    GigsListView, 
+    LocationListView, 
+    SkillsListView, 
+    AuthenticatedUserProfile,
+    GigDetailView,
+    )
 
 urlpatterns = [
     path('user-createprofile/', UserProfileView.as_view(), name='create-user-profile'),
@@ -9,5 +18,6 @@ urlpatterns = [
     path('user-categories/', CategoryListView.as_view(), name='categories'),
     path('user-gigs/', GigsListView.as_view(), name='gigs'),
     path('user-locations/', LocationListView.as_view(), name='locations'),
-    path('user-skills/', SkillsListView.as_view(), name='skills')
+    path('user-skills/', SkillsListView.as_view(), name='skills'),
+    path('user-gigs/<int:id>/', GigDetailView.as_view(), name='gig-detail'),
 ]

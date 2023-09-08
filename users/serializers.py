@@ -37,3 +37,12 @@ class GigsListingSerializer(serializers.ModelSerializer):
     class Meta:
         model = FreelancerGigs
         fields = '__all__'
+
+
+# GigSingleView
+class GigDetailSerializer(serializers.ModelSerializer):
+    category = CategorySerializer()
+    freelancer = FreelancerSerializer()
+    class Meta:
+        model = FreelancerGigs
+        fields = '__all__'
