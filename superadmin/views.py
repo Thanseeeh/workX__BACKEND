@@ -70,8 +70,6 @@ class AddCategoryView(APIView):
     
 
 class CategoryView(APIView):
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
         categories = Category.objects.all()
         serializer = CategorySerializer(categories, many=True)

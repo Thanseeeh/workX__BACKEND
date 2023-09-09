@@ -8,7 +8,7 @@ from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsL
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills
-from freelancers.serializers import GigsSerializer
+from freelancers.serializers import GigsSerializer, FreelancerProfileListSerializer
 
 
 # UserProfile
@@ -107,10 +107,24 @@ class SkillsListView(APIView):
 
 # SingleViewOfGigs
 class GigDetailView(APIView):
-    def get(self, request, id, *args, **kwargs):
+    def get(self, request, id):
         try:
             gig = FreelancerGigs.objects.get(id=id)
             serializer = GigDetailSerializer(gig)
             return Response(serializer.data, status=status.HTTP_200_OK)
         except FreelancerGigs.DoesNotExist:
             return Response({'message': 'Gig not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# FreelancerView
+class FreelancerDetailView(APIView):
+    def get(self, request, gig_owner_id):
+        try:
+            if gig_owner_id is not None:
+                freelancer_profile = FreelancerProfile.objects.get(freelancer=gig_owner_id)
+                serializer = FreelancerProfileListSerializer(freelancer_profile)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Gig owner not found'}, status=status.HTTP_404_NOT_FOUND)
+        except UserProfile.DoesNotExist:
+            return Response({'message': 'Freelancer profile not found'}, status=status.HTTP_404_NOT_FOUND)

@@ -222,8 +222,6 @@ class AddGigs(APIView):
 
 
 class GigsList(APIView):
-    permission_classes = [IsAuthenticated]
-
     def get(self, request, *args, **kwargs):
         try:
             gigs = FreelancerGigs.objects.filter(freelancer=request.user)

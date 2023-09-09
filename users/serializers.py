@@ -3,7 +3,7 @@ from accounts.models import Account
 from accounts.serializers import UserViewSerializer
 from superadmin.serializers import CategorySerializer
 from freelancers.serializers import FreelancerSerializer
-from freelancers.models import FreelancerGigs
+from freelancers.models import FreelancerGigs, FreelancerProfile
 from .models import UserProfile
 
 
@@ -43,6 +43,15 @@ class GigsListingSerializer(serializers.ModelSerializer):
 class GigDetailSerializer(serializers.ModelSerializer):
     category = CategorySerializer()
     freelancer = FreelancerSerializer()
+    freelancer_profile_photo = serializers.SerializerMethodField()
+
     class Meta:
         model = FreelancerGigs
         fields = '__all__'
+
+    def get_freelancer_profile_photo(self, obj):
+        try:
+            freelancer_profile = FreelancerProfile.objects.get(freelancer=obj.freelancer)
+            return freelancer_profile.profile_photo.url
+        except FreelancerProfile.DoesNotExist:
+            return None

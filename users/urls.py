@@ -8,6 +8,7 @@ from .views import (
     SkillsListView, 
     AuthenticatedUserProfile,
     GigDetailView,
+    FreelancerDetailView,
     )
 
 urlpatterns = [
@@ -20,4 +21,5 @@ urlpatterns = [
     path('user-locations/', LocationListView.as_view(), name='locations'),
     path('user-skills/', SkillsListView.as_view(), name='skills'),
     path('user-gigs/<int:id>/', GigDetailView.as_view(), name='gig-detail'),
+    path('user-freelancer/<int:gig_owner_id>/', FreelancerDetailView.as_view(), name='freelancer-detail'),
 ]
