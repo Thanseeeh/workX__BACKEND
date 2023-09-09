@@ -7,8 +7,8 @@ from .models import UserProfile
 from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
-from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills
-from freelancers.serializers import GigsSerializer, FreelancerProfileListSerializer
+from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills, FreelancerEducation, FreelancerExperience
+from freelancers.serializers import FreelancerProfileListSerializer, FreelancerSkillSerializer, FreelancerEducationSerializer, FreelancerExperienceSerializer, GigsSerializer
 
 
 # UserProfile
@@ -128,3 +128,48 @@ class FreelancerDetailView(APIView):
                 return Response({'message': 'Gig owner not found'}, status=status.HTTP_404_NOT_FOUND)
         except UserProfile.DoesNotExist:
             return Response({'message': 'Freelancer profile not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# FreelancerSkillView
+class FreelancerSkillDetailView(APIView):
+    def get(self, request, gig_owner_id):
+        try:
+            skills = FreelancerSkills.objects.filter(freelancer=gig_owner_id)
+            serializer = FreelancerSkillSerializer(skills, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Skills not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# FreelancerEducationView
+class FreelancerEducationDetailView(APIView):
+    def get(self, request, gig_owner_id):
+        try:
+            education = FreelancerEducation.objects.filter(freelancer=gig_owner_id)
+            serializer = FreelancerEducationSerializer(education, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Education not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# FreelancerExperienceView
+class FreelancerExperienceDetailView(APIView):
+    def get(self, request, gig_owner_id):
+        try:
+            experience = FreelancerExperience.objects.filter(freelancer=gig_owner_id)
+            serializer = FreelancerExperienceSerializer(experience, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Experience not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# FreelancerGigView
+class FreelancerGigDetailView(APIView):
+    def get(self, request, gig_owner_id):
+        try:
+            gigs = FreelancerGigs.objects.filter(freelancer=gig_owner_id)
+            serializer = GigsSerializer(gigs, many=True)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)

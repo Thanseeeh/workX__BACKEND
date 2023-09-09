@@ -9,6 +9,10 @@ from .views import (
     AuthenticatedUserProfile,
     GigDetailView,
     FreelancerDetailView,
+    FreelancerSkillDetailView,
+    FreelancerEducationDetailView,
+    FreelancerExperienceDetailView,
+    FreelancerGigDetailView,
     )
 
 urlpatterns = [
@@ -22,4 +26,8 @@ urlpatterns = [
     path('user-skills/', SkillsListView.as_view(), name='skills'),
     path('user-gigs/<int:id>/', GigDetailView.as_view(), name='gig-detail'),
     path('user-freelancer/<int:gig_owner_id>/', FreelancerDetailView.as_view(), name='freelancer-detail'),
+    path('user-freelancer-skill/<int:gig_owner_id>/', FreelancerSkillDetailView.as_view(), name='freelancer-skilldetail'),
+    path('user-freelancer-education/<int:gig_owner_id>/', FreelancerEducationDetailView.as_view(), name='freelancer-educationdetail'),
+    path('user-freelancer-experience/<int:gig_owner_id>/', FreelancerExperienceDetailView.as_view(), name='freelancer-experiencedetail'),
+    path('user-freelancer-gig/<int:gig_owner_id>/', FreelancerGigDetailView.as_view(), name='freelancer-gigdetail'),
 ]
