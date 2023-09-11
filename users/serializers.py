@@ -4,7 +4,7 @@ from accounts.serializers import UserViewSerializer
 from superadmin.serializers import CategorySerializer
 from freelancers.serializers import FreelancerSerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile
-from .models import UserProfile
+from .models import UserProfile, GigsOrder
 
 
 # User
@@ -55,3 +55,10 @@ class GigDetailSerializer(serializers.ModelSerializer):
             return freelancer_profile.profile_photo.url
         except FreelancerProfile.DoesNotExist:
             return None
+
+
+# GigOrder
+class GigsOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GigsOrder
+        fields = '__all__'

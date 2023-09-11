@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
 from .models import UserProfile
-from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer
+from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer, GigsOrderSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills, FreelancerEducation, FreelancerExperience
@@ -173,3 +173,30 @@ class FreelancerGigDetailView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except:
             return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# GigOrderView
+class GigsOrderCreateView(APIView):
+    def post(self, request, format=None):
+        user = request.user
+        gig_id = request.data.get('gig')
+
+        try:
+            gig = FreelancerGigs.objects.get(id=gig_id)
+        except FreelancerGigs.DoesNotExist:
+            return Response({'error': 'Gig not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        order_data = {
+            'user': user.id,
+            'freelancer': gig.freelancer.id,
+            'gig': gig_id,
+            'requirement': request.data.get('requirement'),
+            'amount': request.data.get('amount'),
+        }
+
+        serializer = GigsOrderSerializer(data=order_data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
