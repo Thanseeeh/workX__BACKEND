@@ -5,8 +5,9 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
+from users.models import GigsOrder
+from users.serializers import GigsOrderListSerializer
 from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
-from rest_framework.generics import RetrieveAPIView
 from .serializers import (
     FreelancerProfileSerializer, 
     FreelancerProfileListSerializer, 
@@ -261,3 +262,43 @@ class BlockUnBlockGigsView(APIView):
         
         except FreelancerGigs.DoesNotExist:
             return Response({"message": "Gig not found"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class FreelancerGigsOrderListView(APIView):
+    def get(self, request):
+        try:
+            orders = GigsOrder.objects.filter(freelancer=request.user)
+            serializer = GigsOrderListSerializer(orders, many=True)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class FreelancerAcceptOrderView(APIView):
+    def put(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id)
+            order.status = 'Accepted'
+            order.save()
+
+            serializer = GigsOrderListSerializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except GigsOrder.DoesNotExist:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class FreelancerStartWorkView(APIView):
+    def put(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id)
+            order.status = 'Work Started'
+            order.save()
+
+            serializer = GigsOrderListSerializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except GigsOrder.DoesNotExist:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)

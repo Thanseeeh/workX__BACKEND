@@ -62,3 +62,44 @@ class GigsOrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = GigsOrder
         fields = '__all__'
+
+
+# GigsOrderList
+class GigsOrderListSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    freelancer = serializers.SerializerMethodField()
+    gig = serializers.SerializerMethodField()
+
+    class Meta:
+        model = GigsOrder
+        fields = '__all__'
+
+    def get_user(self, obj):
+        user = obj.user
+        return {
+            'id': user.id,
+            'username': user.username,
+            'first_name': user.first_name,
+            'last_name': user.last_name,
+            'email': user.email,
+            'phone_number': user.phone_number,
+        }
+
+    def get_freelancer(self, obj):
+        freelancer = obj.freelancer
+        return {
+            'id': freelancer.id,
+            'username': freelancer.username,
+            'first_name': freelancer.first_name,
+            'last_name': freelancer.last_name,
+        }
+
+    def get_gig(self, obj):
+        gig = obj.gig
+        return {
+            'id': gig.id,
+            'title': gig.title,
+            'description': gig.description,
+            'image1': gig.image1.url,
+            'delivery_time': gig.delivery_time,
+        }

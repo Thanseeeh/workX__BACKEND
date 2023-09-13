@@ -21,8 +21,11 @@ class UserProfile(models.Model):
 
 # Gigs Order
 class GigsOrder(models.Model):
-    requirement = models.TextField(blank=True)
+    requirement = models.TextField(blank=True, null=True)
     amount = models.PositiveIntegerField(blank=True, null=True)
+    new_amount = models.PositiveIntegerField(blank=True, null=True)
     gig = models.ForeignKey(FreelancerGigs, on_delete=models.CASCADE)
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='user')
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='freelancer')
+    status = models.CharField(max_length=30, default='Pending')
+    reason = models.TextField(blank=True)

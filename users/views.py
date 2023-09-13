@@ -3,8 +3,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
-from .models import UserProfile
-from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer, GigsOrderSerializer
+from .models import UserProfile, GigsOrder
+from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer, GigsOrderSerializer, GigsOrderListSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills, FreelancerEducation, FreelancerExperience
@@ -175,7 +175,7 @@ class FreelancerGigDetailView(APIView):
             return Response({'message': 'Gigs not found'}, status=status.HTTP_404_NOT_FOUND)
         
 
-# GigOrderView
+# GigOrderCreateView
 class GigsOrderCreateView(APIView):
     def post(self, request, format=None):
         user = request.user
@@ -200,3 +200,60 @@ class GigsOrderCreateView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+# GigOrderListView
+class GigsOrderListView(APIView):
+    def get(self, request):
+        try:
+            orders = GigsOrder.objects.filter(user=request.user)
+            serializer = GigsOrderListSerializer(orders, many=True)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+           
+
+# GigOrderStatusView
+class GigsOrderStatusView(APIView):
+    def get(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id)
+            serializer = GigsOrderListSerializer(order)
+            
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+# CancelOrderView
+class CancelOrderView(APIView):
+    def put(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id)
+
+            if order.status not in ['Completed', 'Canceled']:
+                reason = request.data.get('reason')
+                order.status = 'Canceled'
+                order.reason = reason
+                order.save()
+
+                serializer = GigsOrderListSerializer(order)
+                return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'message': 'Order cannot be canceled.'}, status=status.HTTP_400_BAD_REQUEST)
+        except GigsOrder.DoesNotExist:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+
+
+# DeleteOrderView
+class DeleteOrderView(APIView):
+    def delete(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id)
+            order.delete()
+            return Response({'message': 'Order deleted successfully'}, status=status.HTTP_204_NO_CONTENT)
+        except GigsOrder.DoesNotExist:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Failed to delete Order'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

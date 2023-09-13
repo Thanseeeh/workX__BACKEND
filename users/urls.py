@@ -13,7 +13,11 @@ from .views import (
     FreelancerEducationDetailView,
     FreelancerExperienceDetailView,
     FreelancerGigDetailView,
-    GigsOrderCreateView
+    GigsOrderCreateView,
+    GigsOrderListView,
+    GigsOrderStatusView,
+    CancelOrderView,
+    DeleteOrderView,
     )
 
 urlpatterns = [
@@ -32,4 +36,8 @@ urlpatterns = [
     path('user-freelancer-experience/<int:gig_owner_id>/', FreelancerExperienceDetailView.as_view(), name='freelancer-experiencedetail'),
     path('user-freelancer-gig/<int:gig_owner_id>/', FreelancerGigDetailView.as_view(), name='freelancer-gigdetail'),
     path('user-orders/', GigsOrderCreateView.as_view(), name='create-order'),
+    path('user-orderslist/', GigsOrderListView.as_view(), name='list-order'),
+    path('user-orderstatus/<int:order_id>/', GigsOrderStatusView.as_view(), name='status-order'),
+    path('user-ordercancel/<int:order_id>/', CancelOrderView.as_view(), name='cancel-order'),
+    path('user-orderdelete/<int:order_id>/', DeleteOrderView.as_view(), name='delete-order'),
 ]
