@@ -19,6 +19,7 @@ from .views import (
     FreelancerGigsOrderListView,
     FreelancerAcceptOrderView,
     FreelancerStartWorkView,
+    FreelancerCompleteWorkView,
     )
 
 urlpatterns = [
@@ -42,4 +43,5 @@ urlpatterns = [
     path('freelancer-orderslist/', FreelancerGigsOrderListView.as_view(), name='freelancer-list-order'),
     path('freelancer-acceptorder/<int:order_id>/', FreelancerAcceptOrderView.as_view(), name='accept-order'),
     path('freelancer-startwork/<int:order_id>/', FreelancerStartWorkView.as_view(), name='start-work'),
+    path('freelancer-complete-work/<int:order_id>/', FreelancerCompleteWorkView.as_view(), name='complete-work'),
 ]

@@ -18,6 +18,7 @@ from .views import (
     GigsOrderStatusView,
     CancelOrderView,
     DeleteOrderView,
+    StripeCheckoutView,
     )
 
 urlpatterns = [
@@ -40,4 +41,5 @@ urlpatterns = [
     path('user-orderstatus/<int:order_id>/', GigsOrderStatusView.as_view(), name='status-order'),
     path('user-ordercancel/<int:order_id>/', CancelOrderView.as_view(), name='cancel-order'),
     path('user-orderdelete/<int:order_id>/', DeleteOrderView.as_view(), name='delete-order'),
+    path('checkout/', StripeCheckoutView.as_view(), name='checkout-order'),
 ]

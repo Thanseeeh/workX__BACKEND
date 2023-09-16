@@ -1,3 +1,4 @@
+from decimal import Decimal
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -296,6 +297,31 @@ class FreelancerStartWorkView(APIView):
         try:
             order = GigsOrder.objects.get(id=order_id)
             order.status = 'Work Started'
+            order.save()
+
+            serializer = GigsOrderListSerializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except GigsOrder.DoesNotExist:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class FreelancerCompleteWorkView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def put(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id, freelancer=request.user)
+            
+            new_amount = Decimal(request.data.get('new_amount', order.new_amount))
+            commission_percentage = Decimal('0.035')
+            commission = commission_percentage * new_amount
+            total_amount = new_amount + commission
+
+            order.new_amount = request.data.get('new_amount', order.new_amount)
+            order.total_amount = total_amount
+            order.order_raw_images = request.data.get('order_raw_images', order.order_raw_images)
+            order.status = 'Completed'
             order.save()
 
             serializer = GigsOrderListSerializer(order)

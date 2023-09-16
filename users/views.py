@@ -1,3 +1,6 @@
+import stripe
+from django.conf import settings
+from django.shortcuts import redirect
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -9,6 +12,8 @@ from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills, FreelancerEducation, FreelancerExperience
 from freelancers.serializers import FreelancerProfileListSerializer, FreelancerSkillSerializer, FreelancerEducationSerializer, FreelancerExperienceSerializer, GigsSerializer
+
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 # UserProfile
@@ -257,3 +262,54 @@ class DeleteOrderView(APIView):
             return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'message': 'Failed to delete Order'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+
+
+
+
+
+class StripeCheckoutView(APIView):
+    def post(self, request, format=None):
+        order_id = request.data.get('order_id')
+
+        try:
+            # Get the order details (you might need to customize this)
+            order = GigsOrder.objects.get(id=order_id)
+            
+            # Initialize Stripe with your secret key
+            stripe.api_key = settings.STRIPE_SECRET_KEY
+
+            # Create a Stripe Checkout Session
+            session = stripe.checkout.Session.create(
+                payment_method_types=['card'],
+                line_items=[
+                    {
+                        'price_data': {
+                            'currency': 'inr',  # Change this to your currency
+                            'product_data': {
+                                'name': order.gig.title,
+                                'images': [order.gig.image1],
+                            },
+                            'unit_amount': int(order.total_amount * 100),  # Convert to cents
+                        },
+                        'quantity': 1,
+                    },
+                ],
+                mode='payment',
+                success_url=settings.SITE_URL + '/order-status/?success=true',
+                cancel_url=settings.SITE_URL + '/order-status/?canceled=true',
+            )
+
+            # Return the Stripe public key and session ID to the frontend
+            return Response({
+                'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
+                'session_id': session.id,
+            })
+        except GigsOrder.DoesNotExist:
+            return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            # Log the error for debugging purposes
+            print(e)
+            return Response({'error': 'Error creating Stripe Checkout Session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
