@@ -31,3 +31,14 @@ class GigsOrder(models.Model):
     status = models.CharField(max_length=30, default='Pending')
     reason = models.TextField(blank=True)
     order_raw_images = models.ImageField(upload_to='order raw', blank=True, null=True)
+    uploaded_file = models.FileField(upload_to='uploaded_files/', blank=True, null=True)
+
+
+# Transaction History
+class TransactionHistory(models.Model):
+    amount = models.PositiveIntegerField(blank=True, null=True)
+    commission = models.PositiveIntegerField(blank=True, null=True)
+    total_amount = models.PositiveIntegerField(blank=True, null=True)
+    order = models.ForeignKey(GigsOrder, on_delete=models.CASCADE, related_name='order')
+    user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='users')
+    freelancer = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='freelancers')

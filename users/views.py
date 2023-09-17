@@ -1,4 +1,5 @@
 import stripe
+from decimal import Decimal
 from django.conf import settings
 from django.shortcuts import redirect
 from rest_framework.views import APIView
@@ -6,7 +7,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
-from .models import UserProfile, GigsOrder
+from .models import UserProfile, GigsOrder, TransactionHistory
 from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer, GigsOrderSerializer, GigsOrderListSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
@@ -261,38 +262,32 @@ class DeleteOrderView(APIView):
         except GigsOrder.DoesNotExist:
             return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            return Response({'message': 'Failed to delete Order'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+            return Response({'message': 'Failed to delete Order'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)       
 
 
-
-
-
-
-
+# StripePaymentIntegration
 class StripeCheckoutView(APIView):
     def post(self, request, format=None):
         order_id = request.data.get('order_id')
 
         try:
-            # Get the order details (you might need to customize this)
             order = GigsOrder.objects.get(id=order_id)
-            
-            # Initialize Stripe with your secret key
             stripe.api_key = settings.STRIPE_SECRET_KEY
 
-            # Create a Stripe Checkout Session
+            commission_percentage = Decimal('0.035')
+            commission = order.new_amount * commission_percentage
+            total_amount = order.new_amount + commission
+
             session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
                 line_items=[
                     {
                         'price_data': {
-                            'currency': 'inr',  # Change this to your currency
+                            'currency': 'inr',
                             'product_data': {
                                 'name': order.gig.title,
-                                'images': [order.gig.image1],
                             },
-                            'unit_amount': int(order.total_amount * 100),  # Convert to cents
+                            'unit_amount': int(total_amount * 100),
                         },
                         'quantity': 1,
                     },
@@ -302,7 +297,18 @@ class StripeCheckoutView(APIView):
                 cancel_url=settings.SITE_URL + '/order-status/?canceled=true',
             )
 
-            # Return the Stripe public key and session ID to the frontend
+            transaction = TransactionHistory.objects.create(
+                amount=total_amount,
+                commission=commission,
+                total_amount=order.new_amount,
+                order=order,
+                user=request.user,
+                freelancer=order.freelancer,
+            )
+
+            order.status = 'Payment Pending'
+            order.save()
+
             return Response({
                 'stripe_public_key': settings.STRIPE_PUBLIC_KEY,
                 'session_id': session.id,
@@ -310,6 +316,5 @@ class StripeCheckoutView(APIView):
         except GigsOrder.DoesNotExist:
             return Response({'error': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            # Log the error for debugging purposes
             print(e)
             return Response({'error': 'Error creating Stripe Checkout Session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

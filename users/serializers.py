@@ -4,7 +4,7 @@ from accounts.serializers import UserViewSerializer
 from superadmin.serializers import CategorySerializer
 from freelancers.serializers import FreelancerSerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile
-from .models import UserProfile, GigsOrder
+from .models import UserProfile, GigsOrder, TransactionHistory
 
 
 # User

@@ -1,4 +1,7 @@
 from decimal import Decimal
+from django.db.models.signals import post_save
+from django.dispatch import receiver
+from django.core.mail import EmailMessage
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -328,3 +331,48 @@ class FreelancerCompleteWorkView(APIView):
             return Response(serializer.data, status=status.HTTP_200_OK)
         except GigsOrder.DoesNotExist:
             return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+class FreelancerCloseDealView(APIView):
+    parser_classes = (MultiPartParser, FormParser)
+
+    def put(self, request, order_id):
+        try:
+            order = GigsOrder.objects.get(id=order_id, freelancer=request.user)
+            
+            uploaded_file = request.data.get('uploaded_file')
+            if uploaded_file:
+                order.uploaded_file = uploaded_file
+
+            order.status = 'Deal Closed'
+            order.save()
+
+            serializer = GigsOrderListSerializer(order)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except GigsOrder.DoesNotExist:
+            return Response({'message': 'Order not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+@receiver(post_save, sender=GigsOrder)
+def handle_order_status_change(sender, instance, **kwargs):
+    if instance.status == 'Deal Closed':
+        user = instance.user
+
+        email_subject = "Vote of thanks"
+        email_to = user.email
+        message = f"""Hi {user.first_name},
+
+I wanted to express My gratitude for the work you provided. Your trust in My services means a lot to me.
+
+Your project has been successfully completed, and I hope it meets your expectations. If you have any feedback or need further assistance, please don't hesitate to reach out.
+
+Thank you for choosing me for your project. I look forward to serving you again in the future.
+
+Best regards,
+{instance.freelancer.first_name}
+"""
+
+        email_instance = EmailMessage(email_subject, message, to=[email_to])
+        email_instance.send()
