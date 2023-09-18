@@ -7,8 +7,8 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
-from .models import UserProfile, GigsOrder, TransactionHistory
-from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer, GigsOrderSerializer, GigsOrderListSerializer
+from .models import UserProfile, GigsOrder, TransactionHistory, Feedback
+from .serializers import UserProfileSerializer, UserProfileListSerializer, GigsListingSerializer, GigDetailSerializer, GigsOrderSerializer, GigsOrderListSerializer, FeedbackSerializer
 from superadmin.models import Category
 from superadmin.serializers import CategorySerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile, FreelancerSkills, FreelancerEducation, FreelancerExperience
@@ -318,3 +318,26 @@ class StripeCheckoutView(APIView):
         except Exception as e:
             print(e)
             return Response({'error': 'Error creating Stripe Checkout Session'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+# FeebackAndRatingView
+class CreateFeedbackView(APIView):
+    def post(self, request):
+        gig_id = request.data.get('gig_id')
+        rating = request.data.get('rating')
+        comment = request.data.get('comment')
+        
+        # Get the gig and user information (you might need to adjust this part)
+        gig = FreelancerGigs.objects.get(id=gig_id)
+        user = request.user
+
+        # Create the feedback
+        feedback = Feedback.objects.create(
+            gig=gig,
+            user=user,
+            rating=rating,
+            comment=comment
+        )
+        
+        serializer = FeedbackSerializer(feedback)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)

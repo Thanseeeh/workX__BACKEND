@@ -42,3 +42,11 @@ class TransactionHistory(models.Model):
     order = models.ForeignKey(GigsOrder, on_delete=models.CASCADE, related_name='order')
     user = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='users')
     freelancer = models.ForeignKey(Account, on_delete=models.CASCADE, related_name='freelancers')
+
+
+# Feedback
+class Feedback(models.Model):
+    gig = models.ForeignKey(FreelancerGigs, on_delete=models.CASCADE)
+    user = models.ForeignKey(Account, on_delete=models.CASCADE)
+    rating = models.PositiveIntegerField()
+    comment = models.TextField(blank=True)

@@ -4,7 +4,7 @@ from accounts.serializers import UserViewSerializer
 from superadmin.serializers import CategorySerializer
 from freelancers.serializers import FreelancerSerializer
 from freelancers.models import FreelancerGigs, FreelancerProfile
-from .models import UserProfile, GigsOrder, TransactionHistory
+from .models import UserProfile, GigsOrder, Feedback
 
 
 # User
@@ -103,3 +103,12 @@ class GigsOrderListSerializer(serializers.ModelSerializer):
             'image1': gig.image1.url,
             'delivery_time': gig.delivery_time,
         }
+    
+
+# FeedbackAndRating
+class FeedbackSerializer(serializers.ModelSerializer):
+    user = UserSerializer()
+
+    class Meta:
+        model = Feedback
+        fields = '__all__'

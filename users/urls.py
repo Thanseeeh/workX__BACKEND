@@ -19,6 +19,7 @@ from .views import (
     CancelOrderView,
     DeleteOrderView,
     StripeCheckoutView,
+    CreateFeedbackView,
     )
 
 urlpatterns = [
@@ -42,4 +43,6 @@ urlpatterns = [
     path('user-ordercancel/<int:order_id>/', CancelOrderView.as_view(), name='cancel-order'),
     path('user-orderdelete/<int:order_id>/', DeleteOrderView.as_view(), name='delete-order'),
     path('checkout/', StripeCheckoutView.as_view(), name='checkout-order'),
+    path('feedback/submit/', CreateFeedbackView.as_view(), name='submit-feedback'),
+
 ]
