@@ -46,3 +46,9 @@ class GigsSerializer(serializers.ModelSerializer):
     class Meta:
         model = FreelancerGigs
         fields = '__all__'
+
+
+class GigsCountSerializer(serializers.Serializer):
+    total_gigs = serializers.IntegerField()
+    active_gigs = serializers.IntegerField()
+    inactive_gigs = serializers.IntegerField()

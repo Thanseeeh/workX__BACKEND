@@ -1,4 +1,5 @@
 import stripe
+from django.db.models import Sum
 from decimal import Decimal
 from django.conf import settings
 from django.shortcuts import redirect
@@ -352,3 +353,17 @@ class DisplayFeedbackView(APIView):
             return Response({'message': 'Feedback not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
             return Response({'message': 'Failed to Display Feedback'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+        
+
+# TotalSpendingView
+class TotalAmountSpentView(APIView):
+    def get(self, request):
+        try:
+            total_amount_spent = TransactionHistory.objects.filter(user=request.user).aggregate(Sum('amount'))['amount__sum']
+
+            if total_amount_spent is None:
+                total_amount_spent = 0
+
+            return Response({'total_amount_spent': total_amount_spent}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

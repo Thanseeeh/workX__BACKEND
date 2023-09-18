@@ -1,4 +1,5 @@
 from decimal import Decimal
+from django.db.models import Sum
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.mail import EmailMessage
@@ -9,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.generics import get_object_or_404
 from accounts.models import Account
-from users.models import GigsOrder
+from users.models import GigsOrder, TransactionHistory
 from users.serializers import GigsOrderListSerializer
 from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
 from .serializers import (
@@ -19,6 +20,7 @@ from .serializers import (
     FreelancerExperienceSerializer, 
     FreelancerEducationSerializer, 
     GigsSerializer,
+    GigsCountSerializer,
     )
 
 
@@ -376,3 +378,49 @@ Best regards,
 
         email_instance = EmailMessage(email_subject, message, to=[email_to])
         email_instance.send()
+
+
+
+class TotalAmountEarningView(APIView):
+    def get(self, request):
+        try:
+            transactions = TransactionHistory.objects.filter(freelancer=request.user)
+            total_amount_earned = transactions.aggregate(Sum('total_amount'))['total_amount__sum']
+            total_commission = transactions.aggregate(Sum('commission'))['commission__sum']
+            total_client_amount = transactions.aggregate(Sum('amount'))['amount__sum']
+
+            if total_amount_earned is None:
+                total_amount_earned = 0
+            if total_commission is None:
+                total_commission = 0
+            if total_client_amount is None:
+                total_client_amount = 0
+
+            return Response({
+                'total_amount_earned': total_amount_earned,
+                'total_commission': total_commission,
+                'total_client_amount': total_client_amount
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+
+class GigsCount(APIView):
+    def get(self, request):
+        try:
+            freelancer = request.user
+
+            total_gigs = FreelancerGigs.objects.filter(freelancer=freelancer).count()
+            active_gigs = FreelancerGigs.objects.filter(freelancer=freelancer, is_active=True).count()
+            inactive_gigs = total_gigs - active_gigs
+
+            serializer = GigsCountSerializer({
+                'total_gigs': total_gigs,
+                'active_gigs': active_gigs,
+                'inactive_gigs': inactive_gigs,
+            })
+
+            return Response(serializer.data)
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)

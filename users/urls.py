@@ -21,6 +21,7 @@ from .views import (
     StripeCheckoutView,
     CreateFeedbackView,
     DisplayFeedbackView,
+    TotalAmountSpentView,
     )
 
 urlpatterns = [
@@ -46,4 +47,5 @@ urlpatterns = [
     path('checkout/', StripeCheckoutView.as_view(), name='checkout-order'),
     path('feedback/submit/', CreateFeedbackView.as_view(), name='submit-feedback'),
     path('feedback/display/<int:gig_id>/', DisplayFeedbackView.as_view(), name='display-feedback'),
+    path('user-totalamount/', TotalAmountSpentView.as_view(), name='total-amount'),
 ]

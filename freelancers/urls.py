@@ -21,6 +21,8 @@ from .views import (
     FreelancerStartWorkView,
     FreelancerCompleteWorkView,
     FreelancerCloseDealView,
+    TotalAmountEarningView,
+    GigsCount,
     )
 
 urlpatterns = [
@@ -46,4 +48,6 @@ urlpatterns = [
     path('freelancer-startwork/<int:order_id>/', FreelancerStartWorkView.as_view(), name='start-work'),
     path('freelancer-complete-work/<int:order_id>/', FreelancerCompleteWorkView.as_view(), name='complete-work'),
     path('freelancer-close-deal/<int:order_id>/', FreelancerCloseDealView.as_view(), name='close-deal'),
+    path('freelancer-totalamount/', TotalAmountEarningView.as_view(), name='total-amount-earnings'),
+    path('freelancer-gigs-count/', GigsCount.as_view(), name='gigs-count'),
 ]
