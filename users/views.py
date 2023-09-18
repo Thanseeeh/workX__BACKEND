@@ -327,11 +327,9 @@ class CreateFeedbackView(APIView):
         rating = request.data.get('rating')
         comment = request.data.get('comment')
         
-        # Get the gig and user information (you might need to adjust this part)
         gig = FreelancerGigs.objects.get(id=gig_id)
         user = request.user
 
-        # Create the feedback
         feedback = Feedback.objects.create(
             gig=gig,
             user=user,
@@ -341,3 +339,16 @@ class CreateFeedbackView(APIView):
         
         serializer = FeedbackSerializer(feedback)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    
+
+# DisplayFeedbackAndRatingView
+class DisplayFeedbackView(APIView):
+    def get(self, request, gig_id):
+        try:
+            feedback_entries = Feedback.objects.filter(gig__id=gig_id)
+            serializer = FeedbackSerializer(feedback_entries, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        except Feedback.DoesNotExist:
+            return Response({'message': 'Feedback not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'message': 'Failed to Display Feedback'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 

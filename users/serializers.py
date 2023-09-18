@@ -108,7 +108,15 @@ class GigsOrderListSerializer(serializers.ModelSerializer):
 # FeedbackAndRating
 class FeedbackSerializer(serializers.ModelSerializer):
     user = UserSerializer()
+    user_profile_photo = serializers.SerializerMethodField()
 
     class Meta:
         model = Feedback
         fields = '__all__'
+
+    def get_user_profile_photo(self, obj):
+        try:
+            user_profile = UserProfile.objects.get(user=obj.user)
+            return user_profile.profile_photo.url
+        except UserProfile.DoesNotExist:
+            return None
