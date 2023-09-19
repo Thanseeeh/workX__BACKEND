@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from accounts.models import Account
 from accounts.serializers import UserViewSerializer
+from users.models import TransactionHistory, GigsOrder
 from .models import FreelancerProfile, FreelancerSkills, FreelancerExperience, FreelancerEducation, FreelancerGigs
 
 
@@ -48,7 +49,28 @@ class GigsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class FreelancerGigsOrderSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GigsOrder
+        fields = ['id', 'gig']
+
+
 class GigsCountSerializer(serializers.Serializer):
     total_gigs = serializers.IntegerField()
     active_gigs = serializers.IntegerField()
     inactive_gigs = serializers.IntegerField()
+
+
+class TransactionHistorySerializer(serializers.ModelSerializer):
+    user = FreelancerSerializer()
+    order = serializers.SerializerMethodField()
+
+    class Meta:
+        model = TransactionHistory
+        fields = '__all__'
+
+    def get_order(self, obj):
+        return {
+            'id': obj.order.id,
+            'gig_title': obj.order.gig.title if obj.order.gig else None,
+        }

@@ -21,6 +21,7 @@ from .serializers import (
     FreelancerEducationSerializer, 
     GigsSerializer,
     GigsCountSerializer,
+    TransactionHistorySerializer,
     )
 
 
@@ -424,3 +425,34 @@ class GigsCount(APIView):
             return Response(serializer.data)
         except Exception as e:
             return Response({'error': str(e)}, status=400)
+        
+
+
+class OrderStatusCount(APIView):
+    def get(self, request):
+        try:
+            freelancer = request.user
+
+            total_orders_received = GigsOrder.objects.filter(freelancer=freelancer).count()
+            closed_orders = GigsOrder.objects.filter(freelancer=freelancer, status='Deal Closed').count()
+            other_status_orders = total_orders_received - closed_orders
+
+            return Response({
+                'total_orders_received': total_orders_received,
+                'closed_orders': closed_orders,
+                'other_status_orders': other_status_orders,
+            }, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+class FreelancerTransactionHistory(APIView):
+    def get(self, request):
+        try:
+            transactions = TransactionHistory.objects.filter(freelancer=request.user)
+            serializer = TransactionHistorySerializer(transactions, many=True)
+            return Response(serializer.data)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
