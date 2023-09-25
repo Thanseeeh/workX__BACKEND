@@ -63,6 +63,7 @@ class GigsCountSerializer(serializers.Serializer):
 
 class TransactionHistorySerializer(serializers.ModelSerializer):
     user = FreelancerSerializer()
+    freelancer = FreelancerSerializer()
     order = serializers.SerializerMethodField()
 
     class Meta:

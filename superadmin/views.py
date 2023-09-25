@@ -4,12 +4,12 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
 from accounts.models import Account
-from freelancers.models import FreelancerProfile
+from freelancers.models import FreelancerProfile, FreelancerGigs
+from freelancers.serializers import TransactionHistorySerializer
 from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import CategorySerializer
 from .models import Category
-from freelancers.models import FreelancerGigs
-from users.models import GigsOrder
+from users.models import GigsOrder, TransactionHistory
 from users.serializers import GigsListingSerializer
 import logging
 
@@ -142,3 +142,14 @@ class AccountCount(APIView):
         except Exception as e:
             logger.error(str(e))
             return Response({'error': 'Internal Server Error'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+class AdminTransactionHistory(APIView):
+    def get(self, request):
+        try:
+            transactions = TransactionHistory.objects.all()
+            serializer = TransactionHistorySerializer(transactions, many=True)
+            return Response(serializer.data)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

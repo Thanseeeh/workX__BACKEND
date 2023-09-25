@@ -9,6 +9,7 @@ from .views import (
     AdminGigsView,
     OrderStatusCount,
     AccountCount,
+    AdminTransactionHistory,
     )
 
 urlpatterns = [
@@ -21,4 +22,5 @@ urlpatterns = [
     path('gigs/', AdminGigsView.as_view(), name='gigslist'),
     path('order-status/', OrderStatusCount.as_view(), name='statuscounts'),
     path('account-count/', AccountCount.as_view(), name='accountcounts'),
+    path('admin-transaction-history/', AdminTransactionHistory.as_view(), name='transactionhistory'),
 ]
